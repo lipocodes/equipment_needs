@@ -1,0 +1,26 @@
+{
+  "office_equipment": 
+  [
+    {
+      "name": "מהדק",
+      "type": "",
+      "quantity": 0
+    },
+    {
+      "name": "פתקיות דבק",
+      "quantity": 0
+    },
+    {
+      "name": "דבק סלוטייפ",
+      "quantity": 0
+    },
+    {
+      "name": "אוזניות",
+      "quantity": 0
+    },
+    {
+      "name": "עפרונות",
+      "quantity": 0
+    }
+  ]
+}

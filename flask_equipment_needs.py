@@ -1,6 +1,8 @@
 #with open("/home/liorp/silmap/output.txt", "w", encoding="utf-8") as f:
     #f.write(pdf_file.filename + "\n")
 
+
+
 import os
 import json
 from flask import Blueprint, jsonify, request, render_template
