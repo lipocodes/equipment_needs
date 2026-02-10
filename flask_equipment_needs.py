@@ -121,3 +121,41 @@ def decrementEquipmentOrders():
 
 
 
+@flask_equipment_needs.route('/cancel_equipment_orders', methods=['POST'])
+def cancelEquipmentOrders():
+    try:
+        data = request.get_json(silent=True)
+
+        if not data or "item" not in data:
+            return jsonify({"message": "Missing item"}), 400
+
+        item_name = data["item"]
+
+        # Load JSON file
+        with open(JSON_PATH, "r", encoding="utf-8") as f:
+            data_json = json.load(f)
+
+        for equipment in data_json["office_equipment"]:
+            if equipment["item"] == item_name:
+                equipment["quantity"] = 0
+                updated_quantity = equipment["quantity"]
+
+                # Save back to JSON
+                with open(JSON_PATH, "w", encoding="utf-8") as f:
+                    json.dump(data_json, f, ensure_ascii=False, indent=2)
+
+                return jsonify({
+                    "item": item_name,
+                    "quantity": updated_quantity,
+                    "status": "ok"
+                }), 200
+
+        # If we get here, item was not found
+        return jsonify({"message": "Item not found"}), 404
+
+    except Exception as e:
+        return jsonify({
+            "message": "An error occurred",
+            "error": str(e)
+        }), 500
+

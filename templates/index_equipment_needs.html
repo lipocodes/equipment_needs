@@ -159,8 +159,9 @@ function renderEquipment(filter = "") {
     div.innerHTML = `
       <span>${item.item}</span>
       <div>
-        <button class="order-btn" onclick="incrementOrder(${index})">הזמנה</button>
-        <button class="cancel-btn" onclick="decrementOrder(${index})">ביטול הזמנה</button>
+        <button class="order-btn" onclick="incrementOrder(${index})">+</button>
+        <button class="cancel-btn" onclick="decrementOrder(${index})">-</button>
+        <button  onclick="cancelOrder(${index})"  style="background: none;">❌</button>
         <span class="quantity-display" id="quantity-display-${index}">${item.quantity}</span>
       </div>
     `;
@@ -168,6 +169,21 @@ function renderEquipment(filter = "") {
     equipmentContainer.appendChild(div);
   });
 }
+
+
+async function cancelOrder(index) {
+ const item = office_equipment[index];
+
+ const res = await fetch("/cancel_equipment_orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item: item.item })
+    });
+
+  loadEquipment();
+
+}
+
 
 async function incrementOrder(index) {
   const item = office_equipment[index];

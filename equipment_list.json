@@ -2,23 +2,23 @@
   "office_equipment": [
     {
       "item": "מהדק",
-      "quantity": 2
+      "quantity": 0
     },
     {
       "item": "פתקיות דבק",
-      "quantity": 3
+      "quantity": 0
     },
     {
       "item": "דבק סלוטייפ",
-      "quantity": 1
+      "quantity": 0
     },
     {
       "item": "אוזניות",
-      "quantity": 3
+      "quantity": 0
     },
     {
       "item": "עפרונות",
-      "quantity": 2
+      "quantity": 0
     }
   ]
 }
