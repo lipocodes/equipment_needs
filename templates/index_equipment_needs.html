@@ -29,10 +29,20 @@
     color: #1d3557;
     background: linear-gradient(to right, #ffffff, #f7f9fb);
     padding: 25px 15px;
-    margin: 0 0 30px 0;
+    margin: 0 0 20px 0;
     border-bottom: 4px solid #0057b8;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
     gap: 15px;
+  }
+
+  #search-box {
+    width: 90%;
+    max-width: 600px;
+    padding: 8px 10px;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
   }
 
   .equipment-item {
@@ -104,6 +114,8 @@
 
 <h1 class="page-title">YVC Library - Equipment Needs</h1>
 
+<input type="text" id="search-box" placeholder="חפש ציוד..." oninput="filterEquipment()">
+
 <div id="equipment-container"></div>
 
 <div class="order-summary">
@@ -114,25 +126,38 @@
 </div>
 
 <script>
-  const office_equipment = [
-    { "name": "מהדק", "type": "", "quantity": 0 },
-    { "name": "פתקיות דבק", "quantity": 0 },
-    { "name": "דבק סלוטייפ", "quantity": 0 },
-    { "name": "אוזניות", "quantity": 0 },
-    { "name": "עפרונות", "quantity": 0 }
-  ];
+let office_equipment = [];
+const MAX_QUANTITY = 10;
+const equipmentContainer = document.getElementById("equipment-container");
+const orderList = document.getElementById("order-list");
 
-  const MAX_QUANTITY = 10;
-  const equipmentContainer = document.getElementById("equipment-container");
-  const orderList = document.getElementById("order-list");
+// Fetch equipment data from backend JSON
+async function loadEquipment() {
+  try {
+    const res = await fetch("/get_equipment"); // Adjust if blueprint prefix exists
+    const data = await res.json();
+    office_equipment = data.office_equipment;
 
-  // Render equipment items
-  office_equipment.forEach((item, index) => {
+    renderEquipment();
+    renderOrderSummary();
+  } catch (err) {
+    console.error("Failed to load equipment:", err);
+  }
+}
+
+function renderEquipment(filter = "") {
+  equipmentContainer.innerHTML = "";
+
+  const filtered = office_equipment.filter(item =>
+    item.item.includes(filter)
+  );
+
+  filtered.forEach((item, index) => {
     const div = document.createElement("div");
     div.className = "equipment-item";
 
     div.innerHTML = `
-      <span>${item.name}</span>
+      <span>${item.item}</span>
       <div>
         <button class="order-btn" onclick="incrementOrder(${index})">הזמנה</button>
         <button class="cancel-btn" onclick="decrementOrder(${index})">ביטול הזמנה</button>
@@ -142,34 +167,55 @@
 
     equipmentContainer.appendChild(div);
   });
+}
 
-  function incrementOrder(index) {
-    const item = office_equipment[index];
-    if (item.quantity < MAX_QUANTITY) {
-      item.quantity += 1;
-      document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
-      renderOrderSummary();
-    }
+async function incrementOrder(index) {
+  const item = office_equipment[index];
+  if (item.quantity < MAX_QUANTITY) {
+    item.quantity += 1;
+    document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
+    renderOrderSummary();
+
+    const res = await fetch("/increment_equipment_orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item: item.item })
+    });
+    const data = await res.json();
   }
+}
 
-  function decrementOrder(index) {
-    const item = office_equipment[index];
-    if (item.quantity > 0) {
-      item.quantity -= 1;
-      document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
-      renderOrderSummary();
-    }
+async function decrementOrder(index) {
+  const item = office_equipment[index];
+  if (item.quantity > 0) {
+    item.quantity -= 1;
+    document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
+    renderOrderSummary();
+
+    const res = await fetch("/decrement_equipment_orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item: item.item })
+    });
+    const data = await res.json();
   }
+}
 
-  function renderOrderSummary() {
-    const orders = office_equipment
-      .filter(item => item.quantity > 0)
-      .map(item => `<li>${item.name} - כמות: ${item.quantity}</li>`);
+function renderOrderSummary() {
+  const orders = office_equipment
+    .filter(item => item.quantity > 0)
+    .map(item => `<li>${item.item} - כמות: ${item.quantity}</li>`);
 
-    orderList.innerHTML = orders.length > 0 ? orders.join('') : '<li>לא נבחר ציוד עדיין</li>';
-  }
+  orderList.innerHTML = orders.length > 0 ? orders.join('') : '<li>לא נבחר ציוד עדיין</li>';
+}
 
-  renderOrderSummary();
+function filterEquipment() {
+  const filterValue = document.getElementById("search-box").value.trim();
+  renderEquipment(filterValue);
+}
+
+// Initial fetch + render
+loadEquipment();
 </script>
 
 </body>
