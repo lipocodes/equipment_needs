@@ -33,26 +33,31 @@
     border-bottom: 4px solid #0057b8;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
     gap: 15px;
-  }
-
-  #search-box {
-    width: 90%;
-    max-width: 600px;
-    padding: 8px 10px;
-    font-size: 1rem;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #aaa;
+    text-align: center;
   }
 
   #add-item-btn {
+    background-color: #1d3557;
+    align-self: flex-start;
+    margin-bottom: 10px;
     padding: 8px 15px;
     border-radius: 5px;
     border: none;
     color: #fff;
     cursor: pointer;
     font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  #search-box {
+    width: 100%;
+    max-width: 600px;
+    padding: 8px 10px;
+    font-size: 1rem;
     margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    box-sizing: border-box;
   }
 
   .equipment-item {
@@ -60,7 +65,7 @@
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 8px;
-    width: 90%;
+    width: 100%;
     max-width: 600px;
     background-color: #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
@@ -68,6 +73,9 @@
     align-items: center;
     gap: 15px;
     justify-content: space-between;
+    white-space: nowrap; /* prevent wrapping inside item */
+    overflow-x: auto;   /* allow horizontal scroll if too long */
+    box-sizing: border-box;
   }
 
   button {
@@ -77,23 +85,13 @@
     font-size: 1rem;
     cursor: pointer;
     color: #fff;
+    white-space: nowrap;
   }
 
-  .order-btn {
-    background-color: #1d3557;
-  }
-
-  .order-btn:hover {
-    background-color: #457b9d;
-  }
-
-  .cancel-btn {
-    background-color: #b80000;
-  }
-
-  .cancel-btn:hover {
-    background-color: #e63946;
-  }
+  .order-btn { background-color: #1d3557; }
+  .order-btn:hover { background-color: #457b9d; }
+  .cancel-btn { background-color: #b80000; }
+  .cancel-btn:hover { background-color: #e63946; }
 
   .quantity-display {
     min-width: 30px;
@@ -103,40 +101,62 @@
 
   .order-summary {
     margin-top: 30px;
-    width: 90%;
+    width: 100%;
     max-width: 600px;
     background: #f1f3f5;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-sizing: border-box;
   }
 
   .order-summary h3 {
     margin-top: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
   }
 
   .order-summary ul {
     padding-left: 20px;
+    margin: 0;
+  }
+
+  .order-summary button {
+    margin-top: 10px;
+    background-color: #1d3557;
+    color: #fff;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
   }
 
   dialog {
-    padding:20px; 
-    border-radius:10px; 
-    border:1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    width: 90%;
+    max-width: 400px;
+    box-sizing: border-box;
   }
 
   dialog input {
     width: 100%;
-    padding: 5px;
+    padding: 8px;
     margin-bottom: 10px;
+    box-sizing: border-box;
   }
 
   dialog button {
     padding: 5px 10px;
+    font-size: 1rem;
+  }
+
+  /* --- Responsive adjustments --- */
+  @media (max-width: 480px) {
+    .page-title { font-size: 1.5rem; padding: 20px 10px; }
+    #add-item-btn, .order-summary button, button { font-size: 0.9rem; padding: 6px 10px; }
+    .equipment-item { font-size: 0.9rem; padding: 10px; gap: 8px; }
+    .quantity-display { min-width: 25px; }
   }
 </style>
 </head>
@@ -144,10 +164,10 @@
 
 <h1 class="page-title">YVC Library - Equipment Needs</h1>
 
-<input type="text" id="search-box" placeholder="חפש ציוד..." oninput="filterEquipment()">
+<!-- Button above search box, aligned left -->
+<button id="add-item-btn">הגדרת סוג פריט חדש</button>
 
-<!-- Button to open dialog -->
-<button id="add-item-btn" style="background-color:#1d3557;">➕ הוסף ציוד חדש</button>
+<input type="text" id="search-box" placeholder="חפש ציוד..." oninput="filterEquipment()">
 
 <!-- Dialog for adding a new item -->
 <dialog id="add-item-dialog">
@@ -159,16 +179,15 @@
   </div>
 </dialog>
 
-<div id="equipment-container"></div>
+<!-- Equipment container -->
+<div id="equipment-container" style="display:flex; flex-direction:column; gap:15px;"></div>
 
 <div class="order-summary">
-  <h3>
-    סיכום הזמנה
-    <button id="download-txt-btn" style="background-color:#1d3557; font-size:0.9rem;">⬇ הורד TXT</button>
-  </h3>
+  <h3>סיכום הזמנה</h3>
   <ul id="order-list">
     <li>לא נבחר ציוד עדיין</li>
   </ul>
+  <button onclick="downloadOrderTXT()">⬇️ הורד הזמנה כקובץ TXT</button>
 </div>
 
 <script>
@@ -177,32 +196,26 @@ const MAX_QUANTITY = 10;
 const equipmentContainer = document.getElementById("equipment-container");
 const orderList = document.getElementById("order-list");
 
-// Fetch equipment data from backend JSON
+// Fetch equipment data
 async function loadEquipment() {
   try {
     const res = await fetch("/get_equipment");
     const data = await res.json();
     office_equipment = data.office_equipment;
-
     renderEquipment();
     renderOrderSummary();
-  } catch (err) {
-    console.error("Failed to load equipment:", err);
-  }
+  } catch (err) { console.error("Failed to load equipment:", err); }
 }
 
-// Render equipment items sorted by Hebrew alphabet
+// Render equipment
 function renderEquipment(filter = "") {
   equipmentContainer.innerHTML = "";
-
   const filtered = office_equipment
     .filter(item => item.item.includes(filter))
     .sort((a, b) => a.item.localeCompare(b.item, 'he'));
-
   filtered.forEach((item, index) => {
     const div = document.createElement("div");
     div.className = "equipment-item";
-
     div.innerHTML = `
       <span>${item.item}</span>
       <div>
@@ -212,136 +225,87 @@ function renderEquipment(filter = "") {
         <span class="quantity-display" id="quantity-display-${index}">${item.quantity}</span>
       </div>
     `;
-
     equipmentContainer.appendChild(div);
   });
 }
 
+// Increment / Decrement / Cancel
 async function cancelOrder(index) {
   const item = office_equipment[index];
-
-  await fetch("/cancel_equipment_orders", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ item: item.item })
-  });
-
+  await fetch("/cancel_equipment_orders", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item:item.item}) });
   loadEquipment();
 }
-
 async function incrementOrder(index) {
   const item = office_equipment[index];
-  if (item.quantity < MAX_QUANTITY) {
-    item.quantity += 1;
+  if(item.quantity<MAX_QUANTITY){
+    item.quantity++;
     document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
     renderOrderSummary();
-
-    await fetch("/increment_equipment_orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item: item.item })
-    });
+    await fetch("/increment_equipment_orders", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item:item.item}) });
   }
 }
-
 async function decrementOrder(index) {
   const item = office_equipment[index];
-  if (item.quantity > 0) {
-    item.quantity -= 1;
+  if(item.quantity>0){
+    item.quantity--;
     document.getElementById(`quantity-display-${index}`).textContent = item.quantity;
     renderOrderSummary();
-
-    await fetch("/decrement_equipment_orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item: item.item })
-    });
+    await fetch("/decrement_equipment_orders", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item:item.item}) });
   }
 }
 
-// Render order summary sorted by Hebrew alphabet
+// Render order summary
 function renderOrderSummary() {
   const orders = office_equipment
-    .filter(item => item.quantity > 0)
-    .sort((a, b) => a.item.localeCompare(b.item, 'he'))
-    .map(item => `<li>${item.item} - כמות: ${item.quantity}</li>`);
-
-  orderList.innerHTML = orders.length > 0 ? orders.join('') : '<li>לא נבחר ציוד עדיין</li>';
+    .filter(item => item.quantity>0)
+    .sort((a,b)=>a.item.localeCompare(b.item,'he'))
+    .map(item=>`<li>${item.item} - כמות: ${item.quantity}</li>`);
+  orderList.innerHTML = orders.length>0 ? orders.join('') : '<li>לא נבחר ציוד עדיין</li>';
 }
 
+// Filter
 function filterEquipment() {
   const filterValue = document.getElementById("search-box").value.trim();
   renderEquipment(filterValue);
 }
 
-// Initial fetch + render
-loadEquipment();
-
-// --- Add Item Dialog ---
+// Add Item Dialog
 const addItemBtn = document.getElementById("add-item-btn");
 const addItemDialog = document.getElementById("add-item-dialog");
-
-addItemBtn.addEventListener("click", () => {
-  addItemDialog.showModal();
-});
-
-function closeAddDialog() {
-  addItemDialog.close();
+addItemBtn.addEventListener("click", ()=>addItemDialog.showModal());
+function closeAddDialog() { addItemDialog.close(); }
+async function submitNewItem(){
+  const name=document.getElementById("new-item-name").value.trim();
+  if(!name){ alert("אנא הכנס שם ציוד"); return; }
+  try{
+    const res=await fetch("/add_item",{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({item:name, quantity:0})});
+    const data=await res.json();
+    if(res.ok){ alert("ציוד נוסף בהצלחה!"); closeAddDialog(); loadEquipment(); }
+    else{ alert(data.message||"שגיאה בהוספת ציוד"); }
+  } catch(err){ console.error(err); alert("שגיאה בשרת"); }
 }
 
-async function submitNewItem() {
-  const name = document.getElementById("new-item-name").value.trim();
-
-  if (!name) {
-    alert("אנא הכנס שם ציוד");
-    return;
-  }
-
-  try {
-    const res = await fetch("/add_item", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item: name, quantity: 0 })
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert("ציוד נוסף בהצלחה!");
-      closeAddDialog();
-      loadEquipment();
-    } else {
-      alert(data.message || "שגיאה בהוספת ציוד");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("שגיאה בשרת");
-  }
-}
-
-// --- Download TXT Functionality ---
-document.getElementById("download-txt-btn").addEventListener("click", () => {
-  const orders = office_equipment
-    .filter(item => item.quantity > 0)
-    .sort((a, b) => a.item.localeCompare(b.item, 'he'));
-
-  if (orders.length === 0) {
-    alert("לא נבחר ציוד עדיין");
-    return;
-  }
-
-  let textContent = "סיכום הזמנה - YVC Library\n\n";
-  orders.forEach(item => {
-    textContent += `${item.item} - כמות: ${item.quantity}\n`;
-  });
-
-  const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "order.txt";
+// Download TXT RTL
+function downloadOrderTXT(){
+  const orders=office_equipment.filter(item=>item.quantity>0)
+    .sort((a,b)=>a.item.localeCompare(b.item,'he'))
+    .map(item=>`${item.item} - כמות: ${item.quantity}`)
+    .join("\n");
+  if(!orders){ alert("לא נבחר ציוד"); return; }
+  const blob=new Blob([orders], { type:"text/plain;charset=utf-8" });
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="order.txt";
+  a.style.direction="rtl";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
-});
+}
+
+// Initial load
+loadEquipment();
 </script>
 
 </body>
