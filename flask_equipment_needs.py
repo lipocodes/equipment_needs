@@ -159,3 +159,42 @@ def cancelEquipmentOrders():
             "error": str(e)
         }), 500
 
+
+
+@flask_equipment_needs.route('/add_item', methods=['POST'])
+def addItem():
+    try:
+        data = request.get_json(silent=True)
+
+        # Check if "item" is in the request
+        if not data or "item" not in data:
+            return jsonify({"message": "Missing item name"}), 400
+
+        new_item_name = data["item"]
+
+        # Read the existing JSON file
+        with open(JSON_PATH, "r", encoding="utf-8") as f:
+            equipment_data = json.load(f)
+
+        # Optional: prevent duplicates
+        for equipment in equipment_data["office_equipment"]:
+            if equipment["item"] == new_item_name:
+                return jsonify({"message": "Item already exists"}), 400
+
+        # Create the new item object
+        new_item = {
+            "item": new_item_name,
+            "quantity": data.get("quantity", 0)  # default quantity 0
+        }
+
+        # Append to the list
+        equipment_data["office_equipment"].append(new_item)
+
+        # Save back to the JSON file
+        with open(JSON_PATH, "w", encoding="utf-8") as f:
+            json.dump(equipment_data, f, ensure_ascii=False, indent=4)
+
+        return jsonify({"message": "Item added successfully", "item": new_item}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500

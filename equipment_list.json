@@ -1,24 +1,36 @@
 {
   "office_equipment": [
     {
-      "item": "מהדק",
-      "quantity": 0
-    },
-    {
       "item": "פתקיות דבק",
-      "quantity": 0
+      "quantity": 1
     },
     {
       "item": "דבק סלוטייפ",
-      "quantity": 0
+      "quantity": 10
     },
     {
       "item": "אוזניות",
-      "quantity": 0
+      "quantity": 5
     },
     {
       "item": "עפרונות",
       "quantity": 0
+    },
+    {
+      "item": "טישו",
+      "quantity": 1
+    },
+    {
+      "item": "עטים (חבילה)",
+      "quantity": 1
+    },
+    {
+      "item": "סיכות למהדק בינוני",
+      "quantity": 5
+    },
+    {
+      "item": "מהדק בינוני (סטודנטים)",
+      "quantity": 5
     }
   ]
 }
