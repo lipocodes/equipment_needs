@@ -2,15 +2,15 @@
   "office_equipment": [
     {
       "item": "פתקיות דבק",
-      "quantity": 1
+      "quantity": 0
     },
     {
       "item": "דבק סלוטייפ",
-      "quantity": 10
+      "quantity": 0
     },
     {
       "item": "אוזניות",
-      "quantity": 5
+      "quantity": 0
     },
     {
       "item": "עפרונות",
@@ -18,19 +18,43 @@
     },
     {
       "item": "טישו",
-      "quantity": 1
+      "quantity": 0
     },
     {
       "item": "עטים (חבילה)",
-      "quantity": 1
+      "quantity": 0
     },
     {
       "item": "סיכות למהדק בינוני",
-      "quantity": 5
+      "quantity": 0
     },
     {
       "item": "מהדק בינוני (סטודנטים)",
-      "quantity": 5
+      "quantity": 0
+    },
+    {
+      "item": "תה ירוק",
+      "quantity": 0
+    },
+    {
+      "item": "מתקן לסלוטייפ",
+      "quantity": 0
+    },
+    {
+      "item": "סיכות למהדק קטן",
+      "quantity": 0
+    },
+    {
+      "item": "מהדק קטן",
+      "quantity": 0
+    },
+    {
+      "item": "טושים מחיקים ללוח",
+      "quantity": 0
+    },
+    {
+      "item": "מספריים",
+      "quantity": 0
     }
   ]
 }

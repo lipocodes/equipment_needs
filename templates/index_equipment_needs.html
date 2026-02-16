@@ -210,10 +210,7 @@ async function loadEquipment() {
 // Render equipment
 function renderEquipment(filter = "") {
   equipmentContainer.innerHTML = "";
-  const filtered = office_equipment
-    .filter(item => item.item.includes(filter))
-    .sort((a, b) => a.item.localeCompare(b.item, 'he'));
-  filtered.forEach((item, index) => {
+  office_equipment.forEach((item, index) => {
     const div = document.createElement("div");
     div.className = "equipment-item";
     div.innerHTML = `
@@ -232,7 +229,8 @@ function renderEquipment(filter = "") {
 // Increment / Decrement / Cancel
 async function cancelOrder(index) {
   const item = office_equipment[index];
-  await fetch("/cancel_equipment_orders", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item:item.item}) });
+  const res = await fetch("/cancel_equipment_orders", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item:item.item}) });
+  const data  =  await res.json()
   loadEquipment();
 }
 async function incrementOrder(index) {
@@ -273,7 +271,7 @@ function filterEquipment() {
 const addItemBtn = document.getElementById("add-item-btn");
 const addItemDialog = document.getElementById("add-item-dialog");
 addItemBtn.addEventListener("click", ()=>addItemDialog.showModal());
-function closeAddDialog() { addItemDialog.close(); }
+function closeAddDialog() {  addItemDialog.close(); }
 async function submitNewItem(){
   const name=document.getElementById("new-item-name").value.trim();
   if(!name){ alert("אנא הכנס שם ציוד"); return; }

@@ -43,7 +43,6 @@ def incrementEquipmentOrders():
 
         item_name = data["item"]
 
-
         # Load JSON
         with open(JSON_PATH, "r", encoding="utf-8") as f:
             data_json = json.load(f)
